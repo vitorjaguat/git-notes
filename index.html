@@ -21,11 +21,49 @@
     </code></pre>
     <pre><code>
         <span class="red">to set global e-mail:</span>
-        git config --global user.email "gloria@gmail.com"
+        git config --global user.email gloria@gmail.com
 
         <span class="red">to retrieve global e-mail:</span>
-        git config user.email "Gloria Groove"
+        git config user.email gloria@gmail.com
     </code></pre>
+
+    git status
+    git init 
+    git add
+    git add .
+    git commit
+    git commit -m 
+    git commit -am   (add all + commit all + message)
+    git log
+    git log --oneline (shows message title and commit id)
+
+    git commit --amend 
+    redoes the previous commit and create a new one 
+
+    .gitignore
+    Inside the file, we can write patterns to tell Git which files & folders to ignore:
+    .DS_Store will ignore files named .DS_Store 
+    folderName/ will ignore an entire directory
+    *.log will ignore any files with the .log extension
+
+    git branch  (view branches)
+    git branch -v (view branches and details [last commit and its message])
+    git branch {newBranchName}
+    git switch {otherBranchName}
+    git checkout {otherBranchName} (same as git switch)
+    git switch -c {newBranchName} (create a new branch and switch to it)
+    
+    git branch -d {branchName} (delete a branch)
+    git branch -D {branchName} (force delete a branch)
+    >>to delete a branch, we have to be anywhere but in this branch
+
+    git branch -m {newName} (rename branch)
+    >>to rename a branch, we have to be on that same branch 
+
+    git merge {otherBranch}  (merges the otherBranch into the branch you're in)
+
+    
+    
 
 
 </body>
