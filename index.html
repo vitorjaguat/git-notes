@@ -51,6 +51,7 @@
     git branch {newBranchName}
     git switch {otherBranchName}
     git checkout {otherBranchName} (same as git switch)
+    git checkout -b {otherBranchName} (create a new branch and switch to it)
     git switch -c {newBranchName} (create a new branch and switch to it)
     
     git branch -d {branchName} (delete a branch)
@@ -62,8 +63,277 @@
 
     git merge {otherBranch}  (merges the otherBranch into the branch you're in)
 
+    git diff (logs the differences between the last commit and new unstaged changes) ONLY UNSTAGED CHANGES
+    git diff HEAD (logs all changes in the working tree (including staged changes) since your last commit) STAGED AND UNSTAGED CHANGES
     
-    testing testing
+    git diff --staged 
+    git diff --cached   <span class="red">both will list the changes between the staging area and our last commit: "Show me what will be included in my commit if I run git commit right now"</span> ONLY STAGED CHANGES
+
+    git diff {filename}
+    git diff --staged {filename} <span class="red">to view the changes within a specific file by providing git diff with a filename</span>
+
+    git diff branch1..branch2
+    git diff branch1 branch2 <span class="red">will list the changes between the tips of branch1 and branch2</span>
+
+    git diff 4a9da7b..2912870 <span class="red">compare two commits (provide commit hashes)</span>
+
+    git diff HEAD HEAD~1 <span class="red">compare the HEAD commit with its parent commit</span>
+
+    git stash <span class="red">take all uncommitted changes (staged and unstaged) and stash them, reverting the changes in your working copy</span>
+    git stash save <span class="red">same as git stash</span>
+    git stash pop <span class="red">remove the most recent stashed changes in your stash and re-apply them to your working copy</span>
+    git stash apply <span class="red">apply whatever is stashed away, without removing it from the stash. This can be useful if you want to apply stashed changes to multiple branches</span>
+    git stash list <span class="red">view all stashes when you have stashed multiple changes</span>
+    git stash apply stash@{2} <span class="red">apply second stash</span>
+
+    git stash drop stash@{2} <span class="red">clear a particular stash</span>
+    git stash clear <span class="red">clear all stashes</span>
+
+    <h3>Time-travel, reset, restore, reverse</h3>
+    <h4>Time-travel</h4>
+    git checkout 486f994 <span class="red">time-travels to that commit-id</span>
+    <p>Running <b>git checkout {commit-id}</b>, the status will show that the HEAD id detached. That means that the HEAD is not pointing to the most recent commit of the branch; instead, it is pointing to a particular commit in the 'past'. You have a couple of options:</p>
+    <ul>
+        <li>Stay in detached HEAD to examine the contents of the old commit. Poke around, view the files, etc.</li>
+        <li>Leave and go back to wherever you were before - reatach the HEAD <span class="red">git switch {branchName}</span></li>
+        <li>Create a new branch and switch to it. You can now make and save changes, since HEAD is no longer detached. <span class="red">git switch -c {branchName}</span></li>
+    </ul>
+
+    git switch - <span class="red">goes to wherever I was <b>last</b> (previous HEAD position)</span>
+    git checkout HEAD~1 <span class="red">refers to the commit before HEAD (parent)</span>
+    git checkout HEAD~2 <span class="red">refers to 2 commits before HEAD (grandparent)</span>
+
+    <h4>Discarding uncommitted changes</h4>
+    git checkout HEAD {filename} <span class="red">discard any changes in that file, reverting back to the HEAD</span>
+    git checkout -- {filename} <span class="red">same as <b>git checkout HEAD {filename}</b></span>
+    
+    git restore {filename} <span class="red">discard any changes in that file, reverting back to the HEAD; same as <b>git checkout HEAD {filename}</b></span>
+    git restore --source HEAD~1 {filename} <span class="red">restores the file to the point of previous commit</span>
+
+    git restore --staged {filename} <span class="red">unstage files (remove from staging)</span>
+
+    <p>Suppose you've just made a couple of commits on the main branch, but you actually meant to make them on a separate branch instead. To undo those commits, you can use <b>git reset</b>.</p>
+    git reset {commit-hash} <span class="red">reset the repo back to a specific commit. The other commits are gone. The changes continue in our working directory.</span>
+
+    git reset --hard {commit-hash} <span class="red">undo the commits after the refered commit AND undo the changes in our files on working directory</span>
+
+    <p>Otherwise, <b>git revert</b> creates a brand new commit which reverses/undoes the changes from a commit.</p>
+    git revert {commit-hash}
+
+    <p>When collaborating with other devs on a same project, it's always better to use <b>git reverse</b> than <b>git reset</b>, because the second can cause problems with syncing of repos.</p>
+
+    <h2>GitHub</h2>
+    <h3>Cloning repos</h3>
+    git clone {url.git} <span class="red">get this url on the green 'Code' tab on the GitHub repo</span>
+
+    <h3>git remote</h3>
+    <p>If you have a repo on your machine and want to add that repo to GitHub, first you need to create a repo on GitHub, then you have to connect those two repos by creating a <b>remote</b>.</p>
+    <p>In other words, we need to set up a destination to push up to. In Git, we refer to these 'destinations' as remotes. Each remote is simply a URL where a hosted repository lives.</p>
+    <pre><code>
+        git remote <span class="red">view any existing remotes for your repo</span>
+        git remote -v <span>view remotes with more info (verbose)</span>
+
+        git remote add {name} {url} <span class="red">add a new remote</span>
+        git remote rename {oldName} {newName} <span class="red">rename existing remote</span>
+        git remote remove {name} <span class="red">remove a remote</span>
+    </code></pre>
+    <p>If you clone a repo from GH, it automatically sets your remote origin to be that same repo on GH.</p>
+
+    <h3>git push</h3>
+    <p>In order to push a repo to GitHub, we must use <b>git push</b>. We can provide a remoteName and also the exact branch we want to push.</p>
+    <pre><code>
+        git push {remoteName} {branchName} 
+        git push origin main
+    </code></pre>
+    <p>If there is no such a branch in GH, it will be automatically created.</p>
+    <p>You can also push a branch to a branch in GH that has other name:</p>
+    <pre><code>
+        git push {remoteName} {localBranch}:{remoteBranch} 
+        git push origin master:main 
+    </code></pre>
+    <p>The <b>-u</b> option allows us to set the upstream of the branch we're pushing. You can think of it as a link connecting our local branch to a branch on Github. So, the next time we want to push new commits, we just have to write <b>git push</b>.</p>
+    <pre><code>
+        git push -u {remoteName} {branchName} 
+        <span class="red">the next time:</span>
+        git push 
+    </code></pre>
+
+    <p>You can also rename your local branch by using <b>git branch -M main</b>.</p>
+
+    <h3>Fetching and Pulling</h3>
+    <p><b>Remote Tracking Branch</b> is a reference to the state of the master branch on the remote. I can't move this myself. For example, <i>origin/master</i> like a bookmark pointing to the last known commit on the master branch on origin. "At the time you last communicated with this remote repository, here is where this branch was pointing."</p>
+    <pre><code>
+        git branch -r <span class="red">view the remote branches our local repo knows about</span>
+    </code></pre>
+    <p>Use <b>git status</b> to know if your local repo has commits ahead of the remote branch. If there are any commits ahead, you can check how your project looked like when you last pushed, by using <b>git checkout origin/master</b>. This will detach you HEAD.</p>
+
+    <h4>Remote branches</h4>
+    <p>Once you've cloned a repo, we have all the data and Git history for the project at that moment in time. In fact, we only have the HEAD branch in our workspace.</p>
+    <p>To see all remote branches, we can run <b>git branch -r</b>.</p>
+    <p>To connect other branch that is not the HEAD, it's very easy. We just need to run <b>git switch {remoteBranch}</b>. Git will automatically download the files that correspond to that branch and connect the local branch with the remote branch.</p>
+
+    <h4>git fetch & git pull</h4>
+    <p>Fetching allows us to download changes from a remote repo, BUT those changes will not be automatically integrated into our working files. It lets you see what others have been working on, without having to merge those changes into your local repo. "Please go and get the latest information from GH, but don't screw up my working directory."</p>
+    <pre><code>
+        git fetch {remoteName} 
+        git fetch <span class="red">defaults to origin</span>
+        git fetch {remoteName} {branchName} 
+    </code></pre>
+    <p>After fetching files, you will get the updated <b>git status</b>. You can also see the latest changes by running <b>git checkout origin/master</b>, then run <b>git switch -</b> to re-attach the HEAD.</p>
+    <p><b>git pull</b> is another command we can use to retrieve changes from a remote repository. Unlike fetch, pull actually updates our HEAD branch with whatever changes are retrieved from the remote. "Go and download data from GH AND immediately update my local repo with those changes."</p>
+    <pre><code>
+        git pull {remoteName} {branchName}
+    </code></pre>
+    <p>If we just run <b>git pull</b>, git assumes that: 1) remote will default to origin; 2) branch will default to whatever tracking connection is configured for your current branch.</p>
+    <p>Take care! Wherever you run git pull, matters! It will integrate the changes into that particular branch, just like if you run git fetch and then run git merge.</p>
+    <p>Pulls can result in conflicts, and you can resolve them.</p>
+
+    <h3>More about GitHub</h3>
+    <h4>README.md file</h4>
+    <p>A README file is used to communicate important information about a repo, including:</p>
+    <ul>
+        <li>what the project does?</li>
+        <li>how to run the project?</li>
+        <li>why it's noteworthy?</li>
+        <li>who maintains the project?</li>
+    </ul>
+
+    <h4>On Markdown</h4>
+    <p>README.md files are written in Markdown, which is a easy-to-write and easy-to-read syntax.</p>
+    <p>More info on MD:
+        <ul>
+            <li>https://daringfireball.net/projects/markdown/</li>
+            <li>*****<b>https://markdown-it.github.io/</b>*****</li>
+        </ul>
+    </p>
+    <p>VS Code has a built-in Markdown preview, you just have to activate it to see a preview of your page.</p>
+
+    <h4>GitHub Gists</h4>
+    <p>Gists let you share code snippets, entire files, or even applications. You can also use gists to save and share console output when running, debugging, or testing your code. Each gist is a repository that can be cloned or forked by other people.</p>
+    <p>Examples:</p>
+    https://gist.github.com/oanhnn/80a89405ab9023894df7
+    https://gist.github.com/gunjanpatel/18f9e4d1eb609597c50c2118e416e6a6
+
+    <h4>GitHub Pages</h4>
+    <p>Pages lets you deploy your repos as static webpages: xxxuser.github.io/repo-name. You can also create a portfolio page: xxxuser.github.io</p>
+    <p>If you create a branch called <b>gh-pages</b>, it will be automatically selected as the GH Pages default.</p>
+
+
+    <h3>Git Collaboration Workflows</h3>
+    <h4>Centralized workflow</h4>
+    <ul>
+        <li>aka Everyone works on master/main branch</li>
+        <li>the most basic workflow</li>
+        <li>it's straightforward, but not very practical, and can lead to errors and unexpected bugs</li>
+    </ul>
+    <h4>Feature Branches Workflow</h4>
+    <ul>
+        <li>treat master/main branch as the official project history</li>
+        <li>multiple teammates can collaborate on a single feature and share code back and forth without polluting the master/main branch</li>
+        <li>master/main branch won't contain broken code</li>
+    </ul>
+    <h4>Pull Requests</h4>
+    <p>Pulls Requests (PR) are a feature built in to products like Github and Bitbucket. <b>They are not native to Git itself.</b> They allow developers to alert team-members to new work that needs to be reviewed. They provide a mechanism to approve or reject the work on a given branch. They also help facilitate discussion and feedback on the specified commits.</p>
+    <p><i>I have this new stuff I want to merge in to the master branch... what do you all think about it?</i></p>
+
+    <h4>Pull Requests (PR) with no conflicts</h4>
+    <p>PRs with no conflicts can be easily made through GH itself. Then each member of the team need to pull the changes into their own machines.</p>
+
+    <h4>Pull Request (PR) with conflicts</h4>
+    <p>When the PR is accepted, but there are conflicts, this is the workflow to follow. First, we switch to the featureBranch. Merge the mainBranch into it, then resolve the conflicts. Second, switch to the mainBranch. Merge the resolved featureBranch into it - add the <b>--no-ff</b> flag if you want to be sure not to make a fast-forward merge and sinalize it with a commit instead. Then push the changes up to GH.</p>
+    <pre><code>
+        git fetch origin
+        git switch {featureBranchName}
+        git merge {mainBranchName}  
+        <span class="red">now fix conflicts on VS Code!</span>
+
+        git switch {mainBranchName} 
+        git merge --no-ff {featureBranchName} 
+        git push origin master 
+    </code></pre>
+
+    <h4>Fork & Clone workflow</h4>
+    <p>The "fork & clone" workflow is different from anything we've seen so far. Instead of just one centralized GH repo, every developer has their own GH repo in addition to the "official" repo. Developers make changes and push to their own forks before making pull requests. It's very commonly used on large open-source projects where there may be thousands of contributors with only a couple maintainers.</p>
+    <p>This workflow allows that we collaborate on a project without having writing permissions on the project repo.</p>
+    <h5>Fork</h5>
+    <p>When we fork a repo, we're basically asking GH "Make me my own copy of this repo please". As with pull requests, forking is not a Git feature. The ability to fork is implemented by GH.</p>
+    <p>After forking a repo, we can clone it to our machine, work on the code and push it up to our forked repo. Then we can do a PR to propose the implementation of our changes to the original repo.</p>
+    <p>We can also add a new remote linked to the original, this will allow us to keep up-to-date with the changes that are made to the original repo. This remote is usually called <i>original</i> or <i>upstream</i>.</p>
+    <ol>
+        <li>fork the repo</li>
+        <li>clone the fork</li>
+        <li>add upstream remote</li>
+        <li>do some work</li>
+        <li>push to origin</li>
+        <li>open Pull Request</li>
+    </ol>
+
+    <h3>git rebase</h3>
+    <p><b>git rebase</b> is an alternative to <b>git merge</b>. It rewrites the history of the repo, creating a new commit for every single commit made on the feature branch. By doing this, our repo's "timeline" stays more organized, and the commits of the merged featureBranch stay close to each other at the end of the history.</p>
+    <pre><code>
+        git switch {featureBranch} <span class="red">switchs to the feature branch</span>
+        git rebase {mainBranch} <span>add the featureBranch's commits <b>after</b> the mainBranch's history</span>
+    </code></pre>
+    <p><b>When not to rebase?</b> Never rebase commits that have been shared with others. If you have already pushed commits up to GH, DO NOT rebase them unless you are positive no one on the team is using those commits. It's a pain to reconcile the alternate histories!</p>
+
+    <h4>Interactive rebase</h4>
+    <p>Running <b>git rebase</b> with the <b>-i</b> option will enter the interactive mode, which allows us to edit commits, add files, drop commits, etc. Note that we need to specify how far back we want to rewrite commits.</p>
+    <p>Also, notice that we are not rebasing onto another branch. Instead, we are rebasing a series of commits onto the HEAD they currently are based on.</p>
+    <pre><code>
+        git rebase -i HEAD~4
+    </code></pre>
+    <p>If we just want to rename the previously made commit, we just have to run <b>git commit --ammend</b>.</p>
+
+
+    <h3>Git Tags</h3>
+    <p>Tags are pointers that refer to particular points in Git history. We can mark a particular moment in time with a tag. Tags are most often used to mark version releases in projects (v4.1.0, v4.1.1, etc).</p>
+    <p>Think of tags as branch references that do NOT CHANGE. Once a tag is created, it always refers to the same commit; it's just a label for a commit.</p>
+    <h4>Semantic versioning</h4>
+    <p>The semantic versionaing spec outlines a standardized versioning system for software releases. It provides a consistent way for developers to give meaning to their software releases (how big of a change is this release?)</p>
+    <p>Versions consist of three numbers separated by periods. See more on https://semver.org/ </p>
+    <p>For example, v2.4.1</p>
+    <p><b>Patch releases</b> normally do not contain new features or significant changes. They typically signify bug fixes and other changes that do not impact how the code is used.</p>
+    <p><b>Minor releases</b> signify that new features or functionality have been added, but the project is still backwards compatible. No breaking changes. The new functionality is optional and should not force users to rewrite their own code.</p>
+    <p><b>Major releases</b> signify significant changes that is no longer backwards compatible. Features may be removed or changed substantially.</p>
+
+    <h4>Viewing and searching tags</h4>
+    <pre><code>
+        git tag <span class="red">view all repos's tags</span>
+        
+        git tag -l "*beta*" <span class="red">filter all tags containing "beta" in their names</span>
+    </code></pre>
+
+    <h4>Comparing tags with git diff</h4>
+    <pre><code>
+        git checkout v2.3.2 <span class="red">check that commit with detached head</span>
+
+        git diff v17.0.0 c17.0.1 <span class="red">compare two versions</span>
+    </code></pre>
+
+    <h4>Creating tags</h4>
+    <p>There are two types of Git tags we can create: lightweight tags and annotated tags.</p>
+    <p><b>Lightweight tags</b> are just a name/label that points to a particular commit.</p>
+    <pre><code>
+        git tag {tagName} <span class="red">create a tag referring a the commit that HEAD is referencing</span>
+    </code></pre>
+    <p><b>Annotated tags</b> store extra metadata including the author's name and e-mail, the data, and tagging message (like a commit message).</p>
+    <pre><code>
+        git tag -a {tagName} <span class="red">create an annotated tag</span>
+
+        git show v17.1.0 <span class="red">shows annotated tag, with author's name, date, message etc.</span>
+    </code></pre>
+
+    <h4>Tagging previous commits</h4>
+    <pre><code>
+        git tag {tagName} {commitHash}
+    </code></pre>
+    
+    <h4>Replacing tags</h4>
+    <pre><code>
+        git tag {tagName} {commitHash} -f <span class="red">moves a tag to another commit</span>
+
+        git tag -d {tagName} <span class="red">deletes the tag</span>
+    </code></pre>
 
 
 </body>
